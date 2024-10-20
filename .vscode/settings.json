@@ -1,5 +1,6 @@
 {
     "files.associations": {
         "new": "cpp"
-    }
+    },
+    "cmake.sourceDirectory": "/Users/mac/JianqiaoSTL/tests/googletest-1.15.2"
 }

@@ -8,6 +8,7 @@
 #include <cstddef>
 #include <climits>
 #include <iostream>
+#include "config.hpp"
 
 namespace Jianqiao{
     template <class T>

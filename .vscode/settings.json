@@ -1,6 +1,26 @@
 {
     "files.associations": {
-        "new": "cpp"
+        "new": "cpp",
+        "__tree": "cpp",
+        "memory_resource": "cpp",
+        "__hash_table": "cpp",
+        "deque": "cpp",
+        "forward_list": "cpp",
+        "list": "cpp",
+        "map": "cpp",
+        "set": "cpp",
+        "string": "cpp",
+        "unordered_map": "cpp",
+        "unordered_set": "cpp",
+        "vector": "cpp",
+        "*.tcc": "cpp",
+        "__bit_reference": "cpp",
+        "functional": "cpp",
+        "limits": "cpp",
+        "semaphore": "cpp",
+        "algorithm": "cpp",
+        "chrono": "cpp",
+        "random": "cpp"
     },
     "cmake.sourceDirectory": "/Users/mac/JianqiaoSTL/tests/googletest-1.15.2"
 }

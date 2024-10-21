@@ -3,6 +3,8 @@
 #ifndef __JIANQIAO_ALLOC_HPP__
 #define __JIANQIAO_ALLOC_HPP__
 
+#include "config.hpp"
+
 #include <new>
 #include <cstdlib>
 #include <cstddef>
@@ -37,8 +39,31 @@ namespace Jianqiao{
     template <class T>
     inline void _destroy(T* ptr){
         ptr->~T();
+    }    
+
+    /**************************封装上面函数，并提供一个可用的全局函数***********************/
+#ifdef JIANQIAO_SELF_MEMORY_CONTROL
+    template <class T>
+    inline T* allocate(ptrdiff_t size, T*){
+        return _allocate(size, (T*)0);
     }
 
+    template <class T>
+    inline void deallocate(T* buffer){
+        _deallocate(buffer);
+    }
+
+    template <class T1, class T2>
+    inline void construct(T1 *p, const T2& value){
+        _construct(p, value);
+    }
+
+    template <class T>
+    inline void destroy(T* ptr){
+        _destroy(ptr);
+    }
+#endif // JIANQIAO_SELF_MEMORY_CONTROL
+    /********************************************************************************/
     template <class T>
     class allocator{
     public:

@@ -33,18 +33,18 @@ protected:
         return list_node_allocator::allocate();
     }
     void put_node(link_type p){
-        Jianqiao::_deallocate(p);
+        Jianqiao::deallocate(p);
     }
 
     // 初始化一个节点，并且用x来初始化
     link_type create_node(const T& x){
         link_type p = get_node();
-        _construct(&p->data, x);
+        construct(&p->data, x);
         return p;
     }
 
     void destroy_node(link_type p){
-        Jianqiao::_destroy(&p->data);
+        Jianqiao::destroy(&p->data);
         put_node(p);
     }
 
@@ -272,4 +272,3 @@ public:
 
 
 __JIANQIAO_END__
-#endif // __JIANQIAO_LIST_HPP__

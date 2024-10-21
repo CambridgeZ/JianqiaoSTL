@@ -57,20 +57,20 @@ namespace Jianqiao{
         };
 
         // hint 用于指定内存分配器的行为，但是这个参数在C++标准中并没有明确规定
-        pointer allocate(size_type n, const void* hint = 0){
+        static pointer allocate(size_type n, const void* hint = 0){
             return _allocate((difference_type)n, (pointer)0);
         }
 
-        void deallocate(pointer p, size_type n){
+        static void deallocate(pointer p, size_type n){
             _deallocate(p);
         }
 
         // 构造函数
-        void construct(pointer p, const T& value){
+        static void construct(pointer p, const T& value){
             _construct(p, value);
         }
 
-        void destroy(pointer p){
+        static void destroy(pointer p){
             _destroy(p);
         }
 
@@ -82,6 +82,8 @@ namespace Jianqiao{
             return (const_pointer)&x;
         }
     };
+
+    
 
 
     template<class _Tp, class _Alloc>
@@ -95,6 +97,15 @@ namespace Jianqiao{
             { if (0 != __n) _Alloc::deallocate(__p, __n * sizeof (_Tp)); }
         static void deallocate(_Tp* __p)
             { _Alloc::deallocate(__p, sizeof (_Tp)); }
+        static void destroy(_Tp* __p)
+            { _Alloc::destroy(__p); }
+        static void destroy(_Tp* __first, _Tp* __last)
+            { for (; __first < __last; ++__first) _Alloc::destroy(__first); }    
+        static void construct(_Tp* __p, const _Tp& __val)
+            { _Alloc::construct(__p, __val); }
+        static void construct(_Tp* __p)
+            { _Alloc::construct(__p); }
+        
     };
 } // end of namespace Jianqiao
 

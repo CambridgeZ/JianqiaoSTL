@@ -10,6 +10,13 @@
 #include <algorithm>
 #include <cmath>
 
+using std::uninitialized_fill_n;
+using std::uninitialized_copy;
+using std::copy_backward;
+using std::fill;
+using std::fmax;
+using std::copy;
+
 __JIANQIAO_BEGIN__
 
 template <typename T, typename Alloc = allocator<T> >
@@ -21,6 +28,9 @@ public:
     typedef value_type& reference;
     typedef size_t size_type;
     typedef ptrdiff_t difference_type;
+    typedef const value_type* const_pointer;
+    typedef const value_type& const_reference;
+    typedef const iterator const_iterator;
 
 protected:
     typedef simple_alloc<value_type, Alloc> data_allocator;
@@ -47,6 +57,20 @@ protected:
         return result;
     }
 
+    void destroy(iterator first, iterator last){
+        for(iterator cur = first; cur != last; ++cur){
+            data_allocator::destroy(cur);
+        }
+    }
+
+    void destroy(iterator position){
+        data_allocator::destroy(position);
+    }
+
+    void construct(iterator position, const T& x){
+        data_allocator::construct(position, x);
+    }
+
 public:
     iterator begin(){
         return start;
@@ -56,8 +80,16 @@ public:
         return finish;
     }
 
+    // const_iterator begin() const {
+    //     return static_cast<const_iterator>(start);
+    // }
+
+    // const_iterator end() const {
+    //     return static_cast<const_iterator>(finish);
+    // }
+
     size_type size() const {
-        return size_type(end() - begin());
+        return size_type(finish - start);
     }
 
     size_type capacity() const {
@@ -121,6 +153,13 @@ public:
         return position;
     }
 
+    iterator erase(iterator first, iterator last){
+        iterator i = copy(last, finish, first);
+        destroy(i, finish);
+        finish = finish - (last - first);
+        return first;
+    }
+
     void resize(size_type new_size, const T& x){
         if(new_size < size()){
             erase(begin() + new_size, end());
@@ -153,14 +192,14 @@ void vector<T, Alloc>::insert_aux(iterator position, const T& x){
         ++finish;
         T x_copy = x;
         // 将position到finish-2的元素往后移动一个位置
-        copy_backward(position, finish-2,finish-1);
+        std::copy_backward(position, finish-2,finish-1);
         *position = x_copy;
     }
     else{
         const size_type old_size = size();
         const size_type len = old_size!=0 ? 2*old_size: 1;
 
-        iterator new_start = data_allocator::alloc(len);
+        iterator new_start = data_allocator::allocate(len);
         iterator new_finish = new_start;
 
         try{

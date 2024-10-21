@@ -30,7 +30,16 @@
         "span": "cpp",
         "stack": "cpp",
         "string_view": "cpp",
-        "__node_handle": "cpp"
+        "__node_handle": "cpp",
+        "variant": "cpp",
+        "atomic": "cpp",
+        "complex": "cpp",
+        "iterator": "cpp",
+        "optional": "cpp",
+        "format": "cpp",
+        "stop_token": "cpp",
+        "text_encoding": "cpp",
+        "type_traits": "cpp"
     },
     "cmake.sourceDirectory": "/Users/mac/JianqiaoSTL/tests/googletest-1.15.2"
 }

@@ -292,6 +292,7 @@ void vector<T,Alloc> :: insert(iterator position, size_type n, const T& x){
             end_of_storage = new_start + len;
         }
     }
+
 }
 
 

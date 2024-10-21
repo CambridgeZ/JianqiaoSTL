@@ -2,6 +2,7 @@
 #define __JIANQIAO_ITERATOR_HPP__
 
 #include "config.hpp"
+#include "jianqiao_iterator_base.hpp"
 #include <iterator>
 __JIANQIAO_BEGIN__
 

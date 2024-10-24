@@ -13,3 +13,5 @@ using std::ptrdiff_t;
 #if USE_DEQUE == 0 
 #include <deque>
 #endif
+
+#define USE_JIANQIAO_ALLOC 1

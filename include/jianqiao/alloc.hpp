@@ -14,6 +14,8 @@
 #include <iostream>
 #include "config.hpp"
 
+#if USE_JIANQIAO_ALLOC
+
 namespace Jianqiao{
     template <class T>
     inline T* _allocate(ptrdiff_t size, T*){
@@ -188,5 +190,6 @@ namespace Jianqiao{
     };
 } // end of namespace Jianqiao
 
+#endif // USE_JIANQIAO_ALLOC
 
 #endif // __JIANQIAO_ALLOC_HPP__

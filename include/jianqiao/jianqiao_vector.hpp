@@ -80,13 +80,14 @@ public:
         return finish;
     }
 
-    // const_iterator begin() const {
-    //     return static_cast<const_iterator>(start);
-    // }
+    const_iterator begin() const {
+        return start;
+    }
 
-    // const_iterator end() const {
-    //     return static_cast<const_iterator>(finish);
-    // }
+    const_iterator end() const {
+        return finish;
+    }
+
 
     size_type size() const {
         return size_type(finish - start);
@@ -123,6 +124,10 @@ public:
     }
 
     reference front(){
+        return *begin();
+    }
+
+    const_reference front() const {
         return *begin();
     }
 

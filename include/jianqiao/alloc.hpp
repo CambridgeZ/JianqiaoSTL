@@ -14,22 +14,9 @@
 #include <iostream>
 #include "config.hpp"
 
-#if USE_JIANQIAO_ALLOC
+__JIANQIAO_BEGIN__
 
-namespace Jianqiao{
-    template <class T>
-    inline T* _allocate(ptrdiff_t size, T*){
-        // set_new_handler 函数是一个库函数，用来设置一个函数指针，当new操作失败时，系统会调用这个函数指针指向的函数    
-        std::set_new_handler(0);
-        T* tmp = (T*)(::operator new((size_t)(size * sizeof(T))));
-        if(tmp == 0){
-            std::cerr << "out of memory" << std::endl;
-            exit(1);
-        }
-
-        return tmp;
-    }
-
+#ifdef JIANQIAO_SELF_MEMORY_CONTROL
     template <class T>
     inline void _deallocate(T* buffer){
         ::operator delete(buffer);
@@ -43,10 +30,8 @@ namespace Jianqiao{
     template <class T>
     inline void _destroy(T* ptr){
         ptr->~T();
-    }    
+    }
 
-    /**************************封装上面函数，并提供一个可用的全局函数***********************/
-#ifdef JIANQIAO_SELF_MEMORY_CONTROL
     template <class T>
     inline T* allocate(ptrdiff_t size, T*){
         return _allocate(size, (T*)0);
@@ -73,7 +58,30 @@ namespace Jianqiao{
             destroy(first);
         }
     }
+
 #endif // JIANQIAO_SELF_MEMORY_CONTROL
+
+__JIANQIAO_END__
+
+#if USE_JIANQIAO_ALLOC
+
+
+namespace Jianqiao{
+    template <class T>
+    inline T* _allocate(ptrdiff_t size, T*){
+        // set_new_handler 函数是一个库函数，用来设置一个函数指针，当new操作失败时，系统会调用这个函数指针指向的函数    
+        std::set_new_handler(0);
+        T* tmp = (T*)(::operator new((size_t)(size * sizeof(T))));
+        if(tmp == 0){
+            std::cerr << "out of memory" << std::endl;
+            exit(1);
+        }
+
+        return tmp;
+    }
+
+
+
     /********************************************************************************/
     // template <class T>
     // class allocator{
@@ -175,10 +183,12 @@ namespace Jianqiao{
             { return 0 == __n ? 0 : (_Tp*) _Alloc::allocate(__n * sizeof (_Tp)); }
         static _Tp* allocate(void)
             { return (_Tp*) _Alloc::allocate(sizeof (_Tp)); }
+        static void deallocate(_Tp* __p){
+            _Alloc::deallocate(__p, sizeof (_Tp));
+        }
         static void deallocate(_Tp* __p, size_t __n)
             { if (0 != __n) _Alloc::deallocate(__p, __n * sizeof (_Tp)); }
-        static void deallocate(_Tp* __p)
-            { _Alloc::deallocate(__p, sizeof (_Tp)); }
+
         static void destroy(_Tp* __p)
             { _Alloc::destroy(__p); }
         static void destroy(_Tp* __first, _Tp* __last)
@@ -189,6 +199,10 @@ namespace Jianqiao{
             { _Alloc::construct(__p); }
     };
 } // end of namespace Jianqiao
+#else
+#include <memory>
+#include "simple_alloc.hpp"
+using std::allocator;
 
 #endif // USE_JIANQIAO_ALLOC
 

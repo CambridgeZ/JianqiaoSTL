@@ -10,6 +10,7 @@ using std::ptrdiff_t;
 #define JIANQIAO_SELF_MEMORY_CONTROL
 #define USE_DEQUE 0
 
+
 #if USE_DEQUE == 0 
 #include <deque>
 #endif

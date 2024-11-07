@@ -5,149 +5,20 @@
 #ifndef JIANQIAOSTL_JIANQIAO_RB_TREE_HPP
 #define JIANQIAOSTL_JIANQIAO_RB_TREE_HPP
 
-#include "config.hpp"
-#include "jianqiao_iterator_base.hpp"
-#include "alloc.hpp"
+#include "jianqiao_rb_tree_support.hpp"
+#include <iostream>
 
-using std::pair;
+using std::cout;
+using std::endl;
 
 __JIANQIAO_BEGIN__
 
-using __rb_tree_color_type = bool;
-const __rb_tree_color_type  __rb_tree_red = false;      //红色为0
-const __rb_tree_color_type  __rb_tree_black = true;     // 黑色设置为1
-
-struct __rb_tree_node_base{
-    using color_type = __rb_tree_color_type;
-    using base_ptr = __rb_tree_node_base*;
-
-    color_type color;
-    base_ptr parent;
-    base_ptr left;
-    base_ptr right;
-
-    static base_ptr minimum(base_ptr x){
-        while(x->left){
-            x=x->left;
-        }
-        return x;
-    }
-
-    static base_ptr maximum(base_ptr x){
-        while(x->right){
-            x=x->right;
-        }
-        return x;
-    }
-};
-
-template<typename Value>
-struct __rb_tree_node: public __rb_tree_node_base{
-    using link_type = __rb_tree_node<Value>*;
-    Value value_field;
-};
-
-struct __rb_tree_base_iterator{
-
-    using base_ptr = __rb_tree_node_base::base_ptr;
-    using iterator_category = bidirectional_iterator_tag;
-    using difference_type = ptrdiff_t;
-
-    base_ptr node;
-    void increment(){
-        if(node->right){
-            node = node->right;
-            while(node->left != nullptr){
-                node = node->left;
-            }
-        }
-        else{
-            base_ptr y = node->parent;  // 没有右子节点的时候先找到父节点
-            while(node == y->right){    // 当前的节点是父节点的右子节点
-                node = y;
-                y = y->parent;
-            }
-
-            if(node->right != y){       // 如果右子节点不等于此时的父节点
-                node = y;
-            }
-        }
-    }
-
-    void decrement(){
-        if(node->color == __rb_tree_red && node->parent->parent == node){
-            node = node->right;
-            // 发生于node 为 header的情况
-        }
-        else if(node->left != nullptr){
-            base_ptr y = node->left;
-            while(y->right != nullptr){
-                y = y->right;
-            }
-            node = y;
-        }
-        else{
-            base_ptr y = node->parent;
-            while(node == y->left){
-                node = y;
-                y = y->parent;
-            }
-            node = y;
-        }
-    }
-};
-
-template <typename Value, typename Ref, typename Ptr>
-struct __rb_tree_iterator: public __rb_tree_base_iterator {
-    using value_type = Value;
-    using reference = Ref;
-    using pointer = Ptr;
-    using iterator = __rb_tree_iterator<Value, Value&, Value*>;
-    using const_iterator = __rb_tree_iterator<Value, const Value&, const Value*>;
-    using self = __rb_tree_iterator<Value, Ref, Ptr>;
-    using link_type = __rb_tree_node<Value>*;
-
-    __rb_tree_iterator() {}
-    __rb_tree_iterator(link_type x) {node = x;};
-    __rb_tree_iterator(const iterator& it) {node = it.node;};
-
-    reference operator*() const {
-        return link_type(node)->value_field;
-    }
-
-    pointer  operator->() const {
-        return &(operator*());
-    }
-
-    self& operator++ (){
-        increment();
-        return *this;
-    }
-
-    self operator++(int){
-        self old = *this;
-        increment();
-        return old;
-    }
-
-    self& operator-- (){
-        decrement();
-        return *this;
-    }
-
-    self operator--(int ){
-        self old = *this;
-        decrement();
-        return old;
-    }
-};
-
-template<typename Key, typename Value, typename KeyOfValue,
+template<typename Key, typename Value, class KeyOfValue,
         class Compare, class Alloc = allocator<__rb_tree_node<Value> > >
 class rb_tree {
 protected:
     using void_pointer = void*;
-    using base_ptr = __rb_tree_node_base*;
+
     using rb_tree_node = __rb_tree_node<Value>;
     using rb_tree_node_allocator = simple_alloc<rb_tree_node, Alloc>;
     using color_type = __rb_tree_color_type;
@@ -162,6 +33,7 @@ public:
     using link_type = rb_tree_node* ;
     using size_type = size_t;
     using difference_type = ptrdiff_t;
+    using base_ptr = __rb_tree_node_base*;
 
 protected:
     link_type get_node(){
@@ -210,6 +82,10 @@ protected:
      * header 的 left 指向最小值
      * header 的 right 指向最大值
      */
+#ifdef __JIANQIAO_DEBUG_RB_TREE__
+public:
+#endif
+
     link_type& root() const {
         return (link_type&) header->parent;
     }
@@ -285,8 +161,40 @@ public:
     using iterator = __rb_tree_iterator<Value, Value&, Value*>;
 private:
     iterator __insert(base_ptr x, base_ptr y, const value_type& v);
-    link_type __copy(link_type x, link_type p);
-    void __erase(link_type x);
+    link_type __copy(link_type x, link_type p){
+        link_type top = clone_node(x);
+        top->parent = p;
+        try{
+            if(right(x)){
+                top->right = __copy(right(x), top);
+            }
+            p = top;
+            x = left(x);
+            while(x != nullptr){
+                link_type y = clone_node(x);
+                p->left = y;
+                y->parent = p;
+                if(right(x)){
+                    y->right = __copy(right(x), y);
+                }
+                p = y;
+                x = left(x);
+            }
+        }
+        catch(...){
+            __erase(top);
+        }
+        return top;
+    }
+    void __erase(link_type x){
+        while(x != nullptr){
+            // 递归删除左子树
+            __erase(right(x));
+            link_type y = left(x);
+            destroy_node(x);
+            x = y;
+        }
+    }
     void init(){
         header = get_node();            // 产生一个节点空间，令header指向它
         color(header) = __rb_tree_red;  // 令header为红色，用来区分header
@@ -319,7 +227,25 @@ private:
 
 public:
     rb_tree<Key, Value, KeyOfValue, Compare, Alloc>
-    &operator=(const rb_tree<Key, Value, KeyOfValue, Compare, Alloc>& x);
+    &operator=(const rb_tree<Key, Value, KeyOfValue, Compare, Alloc>& x){
+        if(this != &x){
+            clear();
+            node_count = 0;
+            key_compare = x.key_compare;
+            if(x.root() == nullptr){
+                root() = nullptr;
+                leftmost() = header;
+                rightmost() = header;
+            }
+            else{
+                root() = __copy(x.root(), header);
+                leftmost() = minimum(root());
+                rightmost() = maximum(root());
+                node_count = x.node_count;
+            }
+        }
+        return *this;
+    }
     Compare key_comp() const {return key_compare;}
     iterator begin() {return leftmost();}
     iterator end() {return header;}
@@ -331,6 +257,119 @@ public:
     pair<iterator, bool> insert_unique(const value_type& x);
     iterator insert_equal(const value_type& x);
 };
+
+// insert_equal
+template<typename Key, typename Value, class KeyOfValue,
+        class Compare, class Alloc>
+typename rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::iterator
+rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::insert_equal(const value_type &v) {
+    link_type y = header;
+    link_type x = root();
+    while(x != nullptr){
+        // 从根节点开始比较，如果遇到大的则向左进行比较，否则向右进行比较
+        y = x;
+        x = key_compare(KeyOfValue()(v), key(x)) ? left(x) : right(x);
+    }
+    return __insert(x, y, v);
+}
+
+// insert_unique
+// 插入新的值，不允许重复，如果重复则插入无效
+// 返回值为一个pair, 第一个元素为一个RB_tree的迭代器，第二个元素为一个bool值，表示是否插入成功
+
+template<typename Key, typename Value, class KeyOfValue, typename Compare, class Alloc>
+pair<typename rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::iterator, bool>
+rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::insert_unique(const value_type &v) {
+    link_type y = header;
+    link_type x = root();
+    bool comp = true;
+    while(x != nullptr){    // 从根节点向下寻找适当的插入点
+        y = x;
+        comp = key_compare(KeyOfValue()(v), key(x));    // v是否小于x
+        x = comp ? left(x) : right(x);                  // 如果小于则向左，否则向右
+    }
+    iterator j = iterator(y);                    // j为插入点的父节点
+    if(comp){
+        if(j == begin()){   // 如果插入点为最左边
+            // 这个时候说明插入点的最左边一定是最小值，一定是小于v的
+            return pair<iterator, bool>(__insert(x, y, v), true);
+        }
+        else{   // 否则插入点不为最左边
+            --j; // 调整j, 等待回头进行测试
+        }
+    }
+    if(key_compare(key(j.node), KeyOfValue()(v))){
+        // 新的键的值不等于任何键值，插入成功
+        return pair<iterator, bool>(__insert(x, y, v), true);
+    }
+
+    // 如果到这里说明键值已经存在，插入失败
+    return pair<iterator, bool>(j, false);
+}
+
+// __insert: 真正执行了插入操作的函数
+template<typename Key, typename Value, class KeyOfValue, typename Compare, class Alloc>
+typename rb_tree<Key, Value, KeyOfValue, Compare, Alloc>:: iterator
+rb_tree<Key, Value, KeyOfValue, Compare, Alloc> ::
+__insert(base_ptr x_, base_ptr y_, const Value& v){
+    // x_ 为插入点， y_ 为插入点的父节点
+    // v 为插入的值
+    link_type x = (link_type) x_;
+    link_type y = (link_type) y_;
+    link_type z;
+
+    // key_compare 用于比较键值大小，为一个function object
+    if(y == header || x != nullptr || key_compare(KeyOfValue()(v), key(y))){
+        // 如果插入点为header 或者 x不为空 或者 v小于y
+
+        z = create_node(v);
+
+        if(z == nullptr){
+            cout<< "create_node error" << endl;
+        }
+
+        left(y) = z;
+
+        // 如果插入点为header
+        // 也就是说这个节点就是这个树插入进去的第一个节点
+        if(y == header){
+            // 节点就是root节点
+            root() = z;
+            rightmost() = z;
+        }
+        else if(y == leftmost()){
+            // 插入的节点在最左边的左边
+            leftmost() = z;
+        }
+    }
+    else{
+        // 应该插入的节点在y节点的右边的位置
+        z = create_node(v);
+
+        if(z == nullptr){
+            cout<< "create_node error" << endl;
+        }
+
+        right(y) = z;
+        if(y == rightmost()){
+            rightmost() = z;
+        }
+    }
+
+    // 调整信节点应该指向的位置
+    parent(z) = y;      // 新节点的父节点指向y
+    left(z) = nullptr;  // 新节点的左子节点为空
+    right(z) = nullptr; // 新节点的右子节点为空
+
+    // 前面完成的相当于仅仅是二叉排序树的插入操作
+    // 完成插入之后对于颜色的调整操作
+
+    // 以下开始调整红黑树
+    __rb_tree_rebalance(z, header->parent);
+    ++node_count;
+    return iterator(z);
+}
+
 
 __JIANQIAO_END__
 #endif //JIANQIAOSTL_JIANQIAO_RB_TREE_HPP

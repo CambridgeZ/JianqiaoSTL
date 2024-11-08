@@ -6,6 +6,7 @@
 #define JIANQIAOSTL_JIANQIAO_RB_TREE_HPP
 
 #include "jianqiao_rb_tree_support.hpp"
+#include "jianqiao_algorithm.hpp"
 #include <iostream>
 
 using std::cout;
@@ -159,6 +160,8 @@ public:
 
 public:
     using iterator = __rb_tree_iterator<Value, Value&, Value*>;
+    using const_iterator = __rb_tree_iterator<Value, const Value&, const Value*>;
+
 private:
     iterator __insert(base_ptr x, base_ptr y, const value_type& v);
     link_type __copy(link_type x, link_type p){
@@ -248,14 +251,56 @@ public:
     }
     Compare key_comp() const {return key_compare;}
     iterator begin() {return leftmost();}
+    const_iterator begin() const {return leftmost();}
     iterator end() {return header;}
+    const_iterator end() const {return header;}
+    iterator rbegin() {return rightmost();}
+    iterator rend() {return header;}
     bool empty() const {return node_count == 0;}
     size_type size() const {return node_count;}
     size_type max_size() const {return size_type(-1);}
 
+    // 交换
+    void swap( rb_tree<Key, Value, KeyOfValue, Compare, Alloc>& t){
+        Jianqiao::swap(header, t.header);
+        Jianqiao::swap(node_count, t.node_count);
+        Jianqiao::swap(key_compare, t.key_compare);
+    }
+
 public:
     pair<iterator, bool> insert_unique(const value_type& x);
     iterator insert_equal(const value_type& x);
+    iterator find(const Key& k);
+    const_iterator find(const Key& k) const;
+
+    // erase 相关操作
+    size_type erase(const Key& k);
+    void erase(iterator position);
+    void erase(const_iterator position);
+    void erase(iterator first, iterator last);
+    void erase(const_iterator first, const_iterator last);
+
+    iterator lower_bound(const Key& k);
+    iterator upper_bound(const Key& k);
+    // 返回一个pair, 第一个元素为lower_bound, 第二个元素为upper_bound, 也就是一个闭区间，不是左闭右开区间
+    pair<iterator, iterator> equal_range(const Key& k);
+
+    // 运算符重载
+    bool operator==(const rb_tree<Key, Value, KeyOfValue, Compare, Alloc>& x){
+        return node_count == x.node_count && Jianqiao::equal(begin(), end(), x.begin());
+    }
+
+    bool operator!=(const rb_tree<Key, Value, KeyOfValue, Compare, Alloc>& x){
+        return !(*this == x);
+    }
+
+    bool operator<(const rb_tree<Key, Value, KeyOfValue, Compare, Alloc>& x){
+        return Jianqiao::lexicographical_compare(begin(), end(), x.begin(), x.end());
+    }
+
+    bool operator>(const rb_tree<Key, Value, KeyOfValue, Compare, Alloc>& x){
+        return x < *this;
+    }
 };
 
 // insert_equal
@@ -368,6 +413,153 @@ __insert(base_ptr x_, base_ptr y_, const Value& v){
     __rb_tree_rebalance(z, header->parent);
     ++node_count;
     return iterator(z);
+}
+
+
+template<typename Key, typename Value, class KeyOfValue, typename Compare, class Alloc>
+typename rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::iterator
+rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::find(const Key &k) {
+    link_type y = header;   // 最后一个不小于k的节点
+    link_type x = root();   // 当前节点
+    while(x != nullptr){
+        if(!key_compare(key(x), k)){
+            y = x;
+            x = left(x);
+        }
+        else{
+            x = right(x);
+        }
+    }
+    iterator j = iterator(y);
+    return (j == end() || key_compare(k, key(j.node))) ? end() : j;
+}
+
+//const 版的 find
+template<typename Key, typename Value, class KeyOfValue, typename Compare, class Alloc>
+typename rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::const_iterator
+rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::find(const Key &k) const {
+    link_type y = header;   // 最后一个不小于k的节点
+    link_type x = root();   // 当前节点
+    while(x != nullptr){
+        if(!key_compare(key(x), k)){
+            y = x;
+            x = left(x);
+        }
+        else{
+            x = right(x);
+        }
+    }
+    const_iterator j = const_iterator(y);
+    return (j == end() || key_compare(k, key(j.node))) ? end() : j;
+}
+
+//erase 相关操作
+template<typename Key, typename Value, class KeyOfValue, typename Compare, class Alloc>
+typename rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::size_type
+rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::erase(const Key &k) {
+    pair<iterator, iterator> p = equal_range(k);
+    size_type n = distance(p.first, p.second);
+
+//    cout << "n: " << n << endl;
+    // 判断是否找到了k
+
+    // 输出第二个节点的值
+//    cout << "p.second: " << *p.second << endl;
+
+    erase(p.first, p.second);
+    return n+1;
+}
+
+template<typename Key, typename Value, class KeyOfValue, typename Compare, class Alloc>
+void rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::erase(iterator position) {
+    link_type y = (link_type) __rb_tree_rebalance_for_erase(position.node, header->parent, header->left, header->right);
+    destroy_node(y);
+    --node_count;
+}
+
+template<typename Key, typename Value, class KeyOfValue, typename Compare, class Alloc>
+void rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::erase(const_iterator position) {
+    link_type y = (link_type) __rb_tree_rebalance_for_erase(position.node, header->parent, header->left, header->right);
+    destroy_node(y);
+    --node_count;
+}
+
+
+
+template<typename Key, typename Value, class KeyOfValue, typename Compare, class Alloc>
+void rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::erase(iterator first, iterator last) {
+    if(first == begin() && last == end()){
+        clear();
+    }
+    else{
+        while(first != last){
+            erase(first++);
+        }
+    }
+}
+
+template<typename Key, typename Value, class KeyOfValue, typename Compare, class Alloc>
+void rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::erase(const_iterator first, const_iterator last) {
+    if(first == begin() && last == end()){
+        clear();
+    }
+    else{
+        while(first != last){
+            erase(first++);
+        }
+    }
+}
+
+
+// lower_bound
+
+template<typename Key, typename Value, class KeyOfValue, typename Compare, class Alloc>
+typename rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::iterator
+rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::lower_bound(const Key &k) {
+    // 找到第一个不小于k的节点
+    link_type y = header;   // 最后一个不小于k的节点
+    link_type x = root();   // 当前节点
+    while(x != nullptr){
+        if(!key_compare(key(x), k)){
+            // x的键值大于等于k
+            y = x;
+            x = left(x);
+        }
+        else{
+            x = right(x);
+        }
+    }
+    return iterator(y);
+}
+
+// upper_bound
+
+template<typename Key, typename Value, class KeyOfValue, typename Compare, class Alloc>
+typename rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::iterator
+rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::upper_bound(const Key &k) {
+    // 找到第一个大于k的节点
+
+    link_type y = header;   // 最后一个不小于k的节点
+    link_type x = root();   // 当前节点
+    while(x != nullptr){
+        if(key_compare(k, key(x))){
+            // x的键值大于k
+            y = x;
+            x = left(x);
+        }
+        else{
+            x = right(x);
+        }
+    }
+    return iterator(y);
+}
+
+// equal_range
+template <typename Key, typename Value, class KeyOfValue, typename Compare, class Alloc>
+pair<typename rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::iterator,
+        typename rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::iterator>
+rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::equal_range(const Key &k) {
+    return pair<iterator, iterator>(lower_bound(k), upper_bound(k));
 }
 
 

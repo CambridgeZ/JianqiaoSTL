@@ -147,7 +147,7 @@ const __rb_tree_color_type  __rb_tree_black = true;     // 黑色设置为1
             decrement();
             return old;
         }
-    };
+    };// __rb_tree_iterator
 
     // 重载比较操作符
     inline bool operator==(const __rb_tree_base_iterator& x, const __rb_tree_base_iterator& y){
@@ -187,7 +187,7 @@ const __rb_tree_color_type  __rb_tree_black = true;     // 黑色设置为1
 
         y->left = x;
         x->parent = y;
-    }
+    }// __rb_tree_rotate_left
 
     // 右旋操作
     inline void __rb_tree_rotate_right(__rb_tree_node_base* x, __rb_tree_node_base*& root){
@@ -218,7 +218,7 @@ const __rb_tree_color_type  __rb_tree_black = true;     // 黑色设置为1
 
         y->right = x;
         x->parent = y;
-    }
+    }// __rb_tree_rotate_right
 
     inline void __rb_tree_rebalance(__rb_tree_node_base* x, __rb_tree_node_base* &root){
         // 先将新插入的节点设置为红色的节点
@@ -283,6 +283,168 @@ const __rb_tree_color_type  __rb_tree_black = true;     // 黑色设置为1
     }
 
 
+    // 为删除进行的rebalance操作
+    __rb_tree_node_base* __rb_tree_rebalance_for_erase(__rb_tree_node_base* z, __rb_tree_node_base*& root, __rb_tree_node_base*& leftmost, __rb_tree_node_base*& rightmost){
+        __rb_tree_node_base* y = z;
+        __rb_tree_node_base* x = nullptr;
+        __rb_tree_node_base* x_parent = nullptr;
+
+        if(y->left == nullptr){
+            x = y->right;
+        }
+        else if(y->right == nullptr){
+            x = y->left;
+        }
+        else{
+            y = y->right;
+            while(y->left != nullptr){
+                y = y->left;
+            }
+            x = y->right;
+        }
+
+        if(y != z){
+            z->left->parent = y;
+            y->left = z->left;
+            if(y != z->right){
+                x_parent = y->parent;
+                if(x){
+                    x->parent = y->parent;
+                }
+                y->parent->left = x;
+                y->right = z->right;
+                z->right->parent = y;
+            }
+            else{
+                x_parent = y;
+            }
+
+            if(root == z){
+                root = y;
+            }
+            else if(z->parent->left == z){
+                z->parent->left = y;
+            }
+            else{
+                z->parent->right = y;
+            }
+
+            y->parent = z->parent;
+            std::swap(y->color, z->color);
+            y = z;
+        }
+        else{
+            x_parent = y->parent;
+            if(x){
+                x->parent = y->parent;
+            }
+
+            if(root == z){
+                root = x;
+            }
+            else{
+                if(z->parent->left == z){
+                    z->parent->left = x;
+                }
+                else{
+                    z->parent->right = x;
+                }
+            }
+
+            if(leftmost == z){
+                if(z->right == nullptr){
+                    leftmost = z->parent;
+                }
+                else{
+                    leftmost = __rb_tree_node_base::minimum(x);
+                }
+            }
+
+            if(rightmost == z){
+                if(z->left == nullptr){
+                    rightmost = z->parent;
+                }
+                else{
+                    rightmost = __rb_tree_node_base::maximum(x);
+                }
+            }
+        }
+
+        if( y->color != __rb_tree_red){
+            while(x != root && (x == nullptr || x->color == __rb_tree_black)){
+                if(x == x_parent->left){
+                    __rb_tree_node_base* w = x_parent->right;
+                    if(w->color == __rb_tree_red){
+                        w->color = __rb_tree_black;
+                        x_parent->color = __rb_tree_red;
+                        __rb_tree_rotate_left(x_parent, root);
+                        w = x_parent->right;
+                    }
+
+                    if((w->left == nullptr || w->left->color == __rb_tree_black) && (w->right == nullptr || w->right->color == __rb_tree_black)){
+                        w->color = __rb_tree_red;
+                        x = x_parent;
+                        x_parent = x_parent->parent;
+                    }
+                    else{
+                        if(w->right == nullptr || w->right->color == __rb_tree_black){
+                            if(w->left){
+                                w->left->color = __rb_tree_black;
+                            }
+                            w->color = __rb_tree_red;
+                            __rb_tree_rotate_right(w, root);
+                            w = x_parent->right;
+                        }
+                        w->color = x_parent->color;
+                        x_parent->color = __rb_tree_black;
+                        if(w->right){
+                            w->right->color = __rb_tree_black;
+                        }
+                        __rb_tree_rotate_left(x_parent, root);
+                        break;
+                    }
+                }
+                else{
+                    __rb_tree_node_base* w = x_parent->left;
+                    if(w->color == __rb_tree_red){
+                        w->color = __rb_tree_black;
+                        x_parent->color = __rb_tree_red;
+                        __rb_tree_rotate_right(x_parent, root);
+                        w = x_parent->left;
+                    }
+
+                    if((w->right == nullptr || w->right->color == __rb_tree_black) && (w->left == nullptr || w->left->color == __rb_tree_black)){
+                        w->color = __rb_tree_red;
+                        x = x_parent;
+                        x_parent = x_parent->parent;
+                    }
+                    else{
+                        if(w->left == nullptr || w->left->color == __rb_tree_black){
+                            if(w->right){
+                                w->right->color = __rb_tree_black;
+                            }
+                            w->color = __rb_tree_red;
+                            __rb_tree_rotate_left(w, root);
+                            w = x_parent->left;
+                        }
+                        w->color = x_parent->color;
+                        x_parent->color = __rb_tree_black;
+                        if(w->left){
+                            w->left->color = __rb_tree_black;
+                        }
+                        __rb_tree_rotate_right(x_parent, root);
+                        break;
+                    }
+                }
+            }
+
+            if(x){
+                x->color = __rb_tree_black;
+            }
+
+        }
+        return y;
+    }
 
 
 __JIANQIAO_END__

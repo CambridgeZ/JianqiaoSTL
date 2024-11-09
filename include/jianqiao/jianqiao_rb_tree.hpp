@@ -284,6 +284,7 @@ public:
     iterator upper_bound(const Key& k);
     // 返回一个pair, 第一个元素为lower_bound, 第二个元素为upper_bound, 也就是一个闭区间，不是左闭右开区间
     pair<iterator, iterator> equal_range(const Key& k);
+    size_type count(const Key& k) const;
 
     // 运算符重载
     bool operator==(const rb_tree<Key, Value, KeyOfValue, Compare, Alloc>& x){
@@ -302,6 +303,15 @@ public:
         return x < *this;
     }
 };
+
+template<typename Key, typename Value, class KeyOfValue, class Compare, class Alloc>
+typename rb_tree<Key,Value,KeyOfValue,Compare,Alloc>::size_type
+    rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::count(const Key &k) const {
+        pair<const_iterator, const_iterator> p = equal_range(k);
+        size_type n = 0;
+        distance(p.first, p.second, n);
+        return n;
+    }
 
 // insert_equal
 template<typename Key, typename Value, class KeyOfValue,

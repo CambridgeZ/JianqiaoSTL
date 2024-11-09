@@ -11,6 +11,10 @@ __JIANQIAO_BEGIN__
 
 template <class Arg, class Result>
 struct unary_function {
+    /*
+     * 一元函数
+     * 用于创建拥有一个参数的函数对象和基类
+     */
     typedef Arg argument_type;
     typedef Result result_type;
 };
@@ -21,6 +25,29 @@ struct identity : public unary_function<T, T> {
         return x;
     }
 };
+
+template <class Arg1, class Arg2, class Result>
+struct binary_function {
+    /*
+     * 二元函数
+     * 用于创建拥有两个参数的函数对象和基类
+     */
+    typedef Arg1 first_argument_type;
+    typedef Arg2 second_argument_type;
+    typedef Result result_type;
+};
+
+template <class Pair>
+struct select1st : public unary_function<Pair, typename Pair::first_type> {
+    /*
+     * 选择第一个元素
+     * 用于创建拥有一个参数的函数对象和基类
+     */
+    const typename Pair::first_type &operator()(const Pair &x) const {
+        return x.first;
+    }
+};
+
 
 
 

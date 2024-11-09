@@ -16,7 +16,7 @@ using std::cout;
 using std::endl;
 #endif
 
-using std::pair;
+#include "jianqiao_pair.hpp"
 
 __JIANQIAO_BEGIN__
 

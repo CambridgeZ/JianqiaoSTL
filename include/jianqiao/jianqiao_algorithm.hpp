@@ -40,6 +40,14 @@ bool lexicographical_compare(InputIterator1 first1, InputIterator1 last1, InputI
     return first1 == last1 && first2 != last2;
 }
 
+template <typename T>
+struct less{
+    bool operator()(const T& a, const T& b){
+        return a < b;
+    }
+};
+
+
 
 
 __JIANQIAO_END__

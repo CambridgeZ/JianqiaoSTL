@@ -140,19 +140,21 @@ namespace Jianqiao {
         template<class Key1, class Compare1, class Alloc1>
         friend bool operator < (const set<Key1, Compare1, Alloc1>&, const set<Key1, Compare1, Alloc1>&);
 
-    };
+    };// end of set
+
+    template <class Key, class Compare, class Alloc>
+    inline bool operator == (const Jianqiao::set<Key, Compare, Alloc>& x, const Jianqiao::set<Key, Compare, Alloc>& y) {
+        return x.t == y.t;
+    }
+
+    template <class Key, class Compare, class Alloc>
+    inline bool operator < (const Jianqiao::set<Key, Compare, Alloc>& x, const Jianqiao::set<Key, Compare, Alloc>& y) {
+        return x.t < y.t;
+    }
 
 } // Jianqiao
 
-template <class Key, class Compare, class Alloc>
-inline bool operator == (const Jianqiao::set<Key, Compare, Alloc>& x, const Jianqiao::set<Key, Compare, Alloc>& y) {
-    return x.t == y.t;
-}
 
-template <class Key, class Compare, class Alloc>
-inline bool operator < (const Jianqiao::set<Key, Compare, Alloc>& x, const Jianqiao::set<Key, Compare, Alloc>& y) {
-    return x.t < y.t;
-}
 
 
 

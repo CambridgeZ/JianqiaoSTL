@@ -270,6 +270,9 @@ public:
 public:
     pair<iterator, bool> insert_unique(const value_type& x);
     iterator insert_equal(const value_type& x);
+    iterator insert_equal(iterator position, const value_type &v);
+    template<class InputIterator>
+    iterator insert_equal(InputIterator first, InputIterator last);
     iterator find(const Key& k);
     const_iterator find(const Key& k) const;
 
@@ -326,6 +329,52 @@ rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::insert_equal(const value_type &
         x = key_compare(KeyOfValue()(v), key(x)) ? left(x) : right(x);
     }
     return __insert(x, y, v);
+}
+
+template<typename Key, typename Value, class KeyOfValue, class Compare, class Alloc>
+typename rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::iterator
+rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::insert_equal(iterator position, const value_type &v) {
+    if(position.node == header->left){
+        if(size() > 0 && key_compare(KeyOfValue()(v), key(position.node))){
+            return __insert(position.node, position.node, v);
+        }
+        else{
+            return insert_equal(v);
+        }
+    }
+    else if(position.node == header){
+        if(key_compare(key(rightmost()), KeyOfValue()(v))){
+            return __insert(nullptr, rightmost(), v);
+        }
+        else{
+            return insert_equal(v);
+        }
+    }
+    else{
+        iterator before = position;
+        --before;
+        if(key_compare(key(before.node), KeyOfValue()(v)) && key_compare(KeyOfValue()(v), key(position.node))){
+            if(right(before.node) == nullptr){
+                return __insert(nullptr, before.node, v);
+            }
+            else{
+                return __insert(position.node, position.node, v);
+            }
+        }
+        else{
+            return insert_equal(v);
+        }
+    }
+}
+
+template<typename Key, typename Value, class KeyOfValue, class Compare, class Alloc>
+template<class InputIterator>
+typename rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::iterator
+rb_tree<Key, Value, KeyOfValue, Compare, Alloc>::insert_equal(InputIterator first, InputIterator last) {
+    for(; first != last; ++first){
+        insert_equal(*first);
+    }
+    return iterator(header->parent);
 }
 
 // insert_unique

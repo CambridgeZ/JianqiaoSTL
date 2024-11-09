@@ -31,6 +31,17 @@ void test1(){
         std::cout << "not found" << std::endl;
     }
 
+    Jianqiao::map <int, std::string> m2;
+
+    m2 = m;
+
+    if(m2 == m){
+        std::cout << "m2 == m" << std::endl;
+    }
+    else{
+        std::cout << "m2 != m" << std::endl;
+    }
+
 }
 
 int main(){

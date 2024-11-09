@@ -290,7 +290,7 @@ public:
     size_type count(const Key& k) const;
 
     // 运算符重载
-    bool operator==(const rb_tree<Key, Value, KeyOfValue, Compare, Alloc>& x){
+    bool operator==(const rb_tree<Key, Value, KeyOfValue, Compare, Alloc>& x) const {
         return node_count == x.node_count && Jianqiao::equal(begin(), end(), x.begin());
     }
 

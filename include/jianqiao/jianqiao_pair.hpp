@@ -18,6 +18,23 @@ struct pair{
 
     pair(): first(T1()), second(T2()){}
     pair(const T1& a, const T2& b): first(a), second(b){}
+
+    // 重载比较运算符
+    bool operator==(const pair<T1, T2>& x) const {
+        return first == x.first && second == x.second;
+    }
+
+    bool operator!=(const pair<T1, T2>& x) const {
+        return first != x.first || second != x.second;
+    }
+
+    bool operator<(const pair<T1, T2>& x) const {
+        return first < x.first || (!(x.first < first) && second < x.second);
+    }
+
+    bool operator>(const pair<T1, T2>& x) const {
+        return x < *this;
+    }
 };
 
 template <typename T1, typename T2>

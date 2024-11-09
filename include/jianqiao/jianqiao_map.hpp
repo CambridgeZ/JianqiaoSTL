@@ -141,6 +141,7 @@ public:
     pair<iterator, iterator> equal_range(const key_type &x) { return t.equal_range(x); }
     pair<const_iterator, const_iterator> equal_range(const key_type &x) const { return t.equal_range(x); }
 
+    // 重载运算符
     friend bool operator == (const map<Key, T, Compare, Alloc> &x, const map<Key, T, Compare, Alloc> &y){
         return x.t == y.t;
     }
@@ -149,6 +150,12 @@ public:
         return x.t < y.t;
     }
 };
+
+//template <typename Key, typename T, typename Compare, typename Alloc>
+//inline bool operator == (const map<Key, T, Compare, Alloc> &x, const map<Key, T, Compare, Alloc> &y) {
+//    return x.t == y.t;
+//}
+
 
 __JIANQIAO_END__
 

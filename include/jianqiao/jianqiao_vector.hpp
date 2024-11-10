@@ -105,6 +105,10 @@ public:
         return *(begin() + n);
     }
 
+    const_reference operator[](size_type n) const {
+        return *(begin() + n);
+    }
+
     vector(): start(nullptr), finish(nullptr), end_of_storage(nullptr) {}
     vector(size_type n, const T& value){
         fill_initialize(n, value);

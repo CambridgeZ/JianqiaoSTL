@@ -27,6 +27,7 @@ template <class Value, class Key,
         class HashFcn, class ExtractKey, class EqualKey, class Alloc = allocator<__hashtable_node<Value> > >
 class hashtable{
     friend struct __hashtable_iterator<int, Key, HashFcn, ExtractKey, EqualKey, Alloc>;
+    friend struct __hashtable_const_iterator<int, Key, HashFcn, ExtractKey, EqualKey, Alloc>;
 public:
     using hasher = HashFcn;
     using key_equal = EqualKey;
@@ -34,6 +35,12 @@ public:
     using value_type = Value;
     using key_type = Key;
     using iterator = __hashtable_iterator<Value, Key, HashFcn, ExtractKey, EqualKey, Alloc>;
+    using difference_type = ptrdiff_t;
+    using const_iterator = __hashtable_const_iterator<Value, Key, HashFcn, ExtractKey, EqualKey, Alloc>;
+    using const_pointer = const Value*;
+    using const_reference = const Value&;
+    using pointer = Value*;
+    using reference = Value&;
 
 private:
     hasher hash;

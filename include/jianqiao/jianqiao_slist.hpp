@@ -45,7 +45,7 @@ inline size_t __slist_size(__slist_node_base* node){
 struct __slist_iterator_base{
     using size_type = size_t;
     using difference_type = ptrdiff_t;
-    using iterator_category = forword_iterator_tag; // 单向的迭代器
+    using iterator_category = forward_iterator_tag; // 单向的迭代器
 
     __slist_node_base* node; // 用于指向节点的基本结构
     __slist_iterator_base(__slist_node_base* x): node(x) {} // 构造函数

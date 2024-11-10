@@ -144,6 +144,19 @@ public:
         }
     }
 
+    void reserve(size_type n){
+        if(capacity() < n){
+            const size_type old_size = size();
+            iterator tmp = allocate_and_fill(n, T());
+            uninitialized_copy(start, finish, tmp);
+            destroy(start, finish);
+            deallocate();
+            start = tmp;
+            finish = tmp + old_size;
+            end_of_storage = start + n;
+        }
+    }
+
     void pop_back(){
         --finish;
         destroy(finish);
@@ -182,6 +195,12 @@ public:
     }
 
     void insert(iterator position, size_type n, const T& x);
+
+    void swap(vector<T, Alloc>& x){
+        std::swap(start, x.start);
+        std::swap(finish, x.finish);
+        std::swap(end_of_storage, x.end_of_storage);
+    }
 
 };
 

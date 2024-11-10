@@ -48,6 +48,14 @@ struct select1st : public unary_function<Pair, typename Pair::first_type> {
     }
 };
 
+template<class T>
+struct equal_to : public binary_function<T, T, bool> {
+    bool operator()(const T& x, const T& y) const {
+        return x == y;
+    }
+};
+
+
 
 
 

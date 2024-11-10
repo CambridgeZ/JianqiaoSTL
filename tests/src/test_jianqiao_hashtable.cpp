@@ -31,17 +31,42 @@ void test(){
     iht.insert_unique(59);
     iht.insert_unique(63);
     iht.insert_unique(59);
+    iht.insert_unique(63);
+    iht.insert_unique(59);
     cout<<iht.size()<<endl;
 
+    iht.erase(59);
+
     iht.insert_equal(59);
+    iht.insert_equal(59);
+    iht.insert_equal(59);
+
+    cout<<iht.size()<<endl;
+
+    iht.erase(59);
+
+    cout<<iht.size()<<endl;
 
     for(auto iter = iht.begin(); iter != iht.end(); ++iter){
         cout<<*iter<<" ";
     }
     cout<<endl;
 
-    cout<< *iht.find(59)<<endl;
-    cout<< iht.count(59)<<endl;
+//    iht.erase(iht.begin(), iht.end());
+//    cout<<iht.size()<<endl;
+
+    cout<<iht.size()<<endl;
+    iht.erase(iht.begin());
+    cout<<iht.size()<<endl;
+
+
+//    for(auto iter = iht.begin(); iter != iht.end(); ++iter){
+//        cout<<*iter<<" ";
+//    }
+//    cout<<endl;
+//
+//    cout<< *iht.find(59)<<endl;
+//    cout<< iht.count(59)<<endl;
 
 }
 

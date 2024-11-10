@@ -296,6 +296,135 @@ public:
         clear();
     }
 
+    // erase 的各种实现
+
+    void erase(const key_type& key) {
+        // 删除hash_table 当中所有关键字为key的元素
+
+        size_type n = bkt_num_key(key);
+        node* first = buckets[n];
+        if(first){
+            // 如果对应的所在的桶是有元素的
+            while(equals(get_key(first->val), key)){
+                // 如果第一个元素就是要删除的元素
+                node* next = first->next;
+                delete_node(first);
+                first = next;
+                buckets[n] = first;
+                --num_elements;
+                if(!first){
+                    return ;
+                }
+            }
+
+            node* cur = first;
+            node* next = cur->next;
+
+            while(next){
+                // 遍历桶提供的链表，然后看看链表里面是否有对应的元素
+                if(equals(get_key(next->val), key)){
+                    cur->next = next->next;
+                    delete_node(next);
+                    next = cur->next;
+                    --num_elements;
+                }
+                else{
+                    cur = next;
+                    next = cur->next;
+                }
+            }
+        }
+
+    }
+
+    void erase(iterator it){
+        // 删除it所指向的元素
+        node* p = it.cur;
+        if(p){
+            // 在链表当中找到对应的节点并对节点实行删除操作
+            size_type n = bkt_num(p->val);
+            node* cur = buckets[n];
+            if(cur == p){
+                buckets[n] = cur->next;
+                delete_node(cur);
+                --num_elements;
+            }
+            else{
+                node* next = cur->next;
+                while(next){
+                    if(next == p){
+                        cur->next = next->next;
+                        delete_node(next);
+                        --num_elements;
+                        break;
+                    }
+                    else{
+                        cur = next;
+                        next = cur->next;
+                    }
+                }
+            }
+        }
+    }
+
+    void erase(iterator begin, iterator end){
+        // 删除begin 到 end 之间的元素
+
+        // 分别计算begin 和 end 所在的桶的位置
+        size_type first_bucket = begin.cur ? bkt_num(begin.cur->val) : buckets.size();
+        size_type last_bucket = end.cur ? bkt_num(end.cur->val) : buckets.size();
+        if(begin.cur == end.cur){
+            // 如果两个直接就是一个元素，也就是说需要删除的是一个空去见
+            return ;
+        }
+        else if(first_bucket == last_bucket){
+            // 两个不是一个元素，但是在一个桶当中
+            erase_bucket(first_bucket, begin.cur, end.cur);
+        }
+        else{
+            erase_bucket(first_bucket, begin.cur, 0);
+            for(size_type n = first_bucket + 1; n < last_bucket; ++n){
+                erase_bucket(n, 0);
+            }
+            if(last_bucket != buckets.size()){
+                erase_bucket(last_bucket, end.cur);
+            }
+        }
+    }
+
+    void erase_bucket(size_type n, node* first, node* last){
+        // 删除桶n当中的first 到 last 之间的元素
+        node* cur = buckets[n];
+        if(cur == first){
+            erase_bucket(n, last);
+        }
+        else{
+            node* next;
+            for(next = cur->next; next != first; cur = next, next = cur->next){
+                // 什么都不做
+            }
+            while(next != last){
+                cur->next = next->next;
+                delete_node(next);
+                next = cur->next;
+                --num_elements;
+            }
+        }
+    }
+
+    void erase_bucket(size_type n, node* last){
+        // 删除last 之前的所有元素
+        node* cur = buckets[n];
+        while(cur != last){
+            node* next = cur->next;
+            delete_node(cur);
+            cur = next;
+            buckets[n] = cur;
+            --num_elements;
+        }
+    }
+
+
 };
 
 

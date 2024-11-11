@@ -280,17 +280,17 @@ public:
         return end();
     }
 
-    iterator find(const value_type& k){
-        /*
-         * 确定在哪个bucket当中，然后遍历这个bucket当中的链表
-         */
-        size_type n = bkt_num(k);
-        node* first;
-        for(first = buckets[n]; first && !equals(get_key(first->val), get_key(k)); first = first->next){
-            // 什么都不做
-        }
-        return iterator(first, this);
-    }
+//    iterator find(const value_type& k){
+//        /*
+//         * 确定在哪个bucket当中，然后遍历这个bucket当中的链表
+//         */
+//        size_type n = bkt_num(k);
+//        node* first;
+//        for(first = buckets[n]; first && !equals(get_key(first->val), get_key(k)); first = first->next){
+//            // 什么都不做
+//        }
+//        return iterator(first, this);
+//    }
 
     iterator find(const key_type& k){
         /*

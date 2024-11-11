@@ -59,7 +59,7 @@ __hashtable_iterator<Value, Key, HashFcn, ExtractKey, EqualKey, Alloc>&
             if(!cur){// 已经到了当前链表的最后一个
                 size_type bucket = ht->bkt_num(old->val);
 
-                while(!cur && ++bucket < ht->buckets.size()){
+                while(!cur && ++bucket < ht->bucket_count()){
                     // 找到下面一个有元素的链表
                     cur = ht->buckets[bucket];
                 }

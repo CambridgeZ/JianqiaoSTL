@@ -28,6 +28,8 @@ template <class Value, class Key,
 class hashtable{
     friend struct __hashtable_iterator<int, Key, HashFcn, ExtractKey, EqualKey, Alloc>;
     friend struct __hashtable_const_iterator<int, Key, HashFcn, ExtractKey, EqualKey, Alloc>;
+    friend struct __hashtable_iterator<Value, Key, HashFcn, ExtractKey, EqualKey, Alloc>;
+    friend struct __hashtable_const_iterator<Value, Key, HashFcn, ExtractKey, EqualKey, Alloc>;
 public:
     using hasher = HashFcn;
     using key_equal = EqualKey;
@@ -138,6 +140,11 @@ public:
                 buckets.swap(tmp);
             }
         }
+    }
+
+    void resize(size_type num_elements_hint, const hasher& hf){
+        hash = hf;
+        resize(num_elements_hint);
     }
 
     //swap
@@ -280,6 +287,18 @@ public:
         size_type n = bkt_num(k);
         node* first;
         for(first = buckets[n]; first && !equals(get_key(first->val), get_key(k)); first = first->next){
+            // 什么都不做
+        }
+        return iterator(first, this);
+    }
+
+    iterator find(const key_type& k){
+        /*
+         * 确定在哪个bucket当中，然后遍历这个bucket当中的链表
+         */
+        size_type n = bkt_num_key(k);
+        node* first;
+        for(first = buckets[n]; first && !equals(get_key(first->val), k); first = first->next){
             // 什么都不做
         }
         return iterator(first, this);
@@ -429,6 +448,64 @@ public:
             buckets[n] = cur;
             --num_elements;
         }
+    }
+
+    pair<iterator, iterator> equal_range(const value_type& obj){
+        // 返回一个pair，pair的第一个元素是一个迭代器，指向第一个等于obj的元素
+        // pair的第二个元素是一个迭代器，指向最后一个等于obj的元素的下一个元素
+        const size_type n = bkt_num(obj);
+        node* first;
+        for(first = buckets[n]; first && !equals(get_key(first->val), get_key(obj)); first = first->next){
+            // 什么都不做
+        }
+        if(first){
+            node* last = first;
+            while(last->next && equals(get_key(last->next->val), get_key(obj))){
+                last = last->next;
+            }
+            return pair<iterator, iterator>(iterator(first, this), iterator(last, this));
+        }
+        else{
+            return pair<iterator, iterator>(iterator(nullptr, this), iterator(nullptr, this));
+        }
+    }
+
+    pair<const_iterator , const_iterator > equal_range (const value_type& obj) const{
+        const size_type n = bkt_num(obj);
+        const node* first;
+        for(first = buckets[n]; first && !equals(get_key(first->val), get_key(obj)); first = first->next){
+            // 什么都不做
+        }
+
+        if(first){
+            const node* last = first;
+            while(last->next && equals(get_key(last->next->val), get_key(obj))){
+                last = last->next;
+            }
+            return pair<const_iterator, const_iterator>(const_iterator(first, this), const_iterator(last, this));
+        }
+        else{
+            return pair<const_iterator, const_iterator>(const_iterator(nullptr, this), const_iterator(nullptr, this));
+        }
+    }
+
+    // find_or_insert
+    reference find_or_insert(const value_type& obj){
+        size_type n = bkt_num(obj);
+        node* first = buckets[n];
+        for(node* cur = first; cur; cur = cur->next){
+            if(equals(get_key(cur->val), get_key(obj))){
+                // 如果发现有键值相同的，就返回
+                return cur->val;
+            }
+        }
+        // 如果没有找到对应的元素，就插入
+        resize(num_elements + 1);
+        node* tmp = new_node(obj);
+        tmp->next = first;
+        buckets[n] = tmp;
+        ++num_elements;
+        return tmp->val;
     }
 
 

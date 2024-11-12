@@ -55,7 +55,55 @@ struct equal_to : public binary_function<T, T, bool> {
     }
 };
 
+template<class T>
+struct plus : public binary_function<T, T, T> {
+    T operator()(const T& x, const T& y) const {
+        return x + y;
+    }
+};
 
+template<class T>
+struct multiplies : public binary_function<T, T, T> {
+    T operator()(const T& x, const T& y) const {
+        return x * y;
+    }
+};
+
+template<class T>
+struct logical_and : public binary_function<T, T, T> {
+    T operator()(const T& x, const T& y) const {
+        return x && y;
+    }
+};
+
+template<class T>
+struct logical_or : public binary_function<T, T, T> {
+    T operator()(const T& x, const T& y) const {
+        return x || y;
+    }
+};
+
+//identity_element
+
+template <class T>
+inline T identity_element(plus<T>) {
+    return T(0);
+}
+
+template <class T>
+inline T identity_element(multiplies<T>) {
+    return T(1);
+}
+
+template <class T>
+inline T identity_element(logical_and<T>) {
+    return T(true);
+}
+
+template <class T>
+inline T identity_element(logical_or<T>) {
+    return T(false);
+}
 
 
 

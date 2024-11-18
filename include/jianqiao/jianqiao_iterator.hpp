@@ -6,10 +6,6 @@
 #include <iterator>
 __JIANQIAO_BEGIN__
 
-
-
-
-
 __JIANQIAO_END__
 
 #endif // __JIANQIAO_ITERATOR_HPP__

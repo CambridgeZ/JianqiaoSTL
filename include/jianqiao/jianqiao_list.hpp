@@ -94,6 +94,22 @@ public:
         return tmp;
     }
 
+    iterator insert(iterator position, size_t n, const T& x){
+        for(size_t i = 0; i < n; ++i){
+            position = insert(position, x);
+        }
+        return position;
+    }
+
+    template <typename InputIterator>
+    iterator insert(iterator position, InputIterator first, InputIterator last){
+        for(; first != last; ++first){
+            position = insert(position, *first);
+            position++;
+        }
+        return position;
+    }
+
     void push_back(const T& x){
         insert(end(), x);
     }
@@ -266,6 +282,36 @@ public:
         link_type tmp = node;
         node = x.node;
         x.node = tmp;
+    }
+
+public:
+    // 拷贝构造函数
+    list(const list& x){
+        empty_initialize();
+        insert(begin(), x.begin(), x.end());
+    }
+
+    // 采用初始化列表的方式
+    list(std::initializer_list<T> il){
+        empty_initialize();
+        insert(begin(), il.begin(), il.end());
+    }
+
+    // 采用迭代器进行构造
+    template <typename InputIterator>
+    list(InputIterator first, InputIterator last){
+        empty_initialize();
+        insert(begin(), first, last);
+    }
+
+    list(size_t n, const T& value){
+        empty_initialize();
+        insert(begin(), n, value);
+    }
+
+    list(size_t n){
+        empty_initialize();
+        insert(begin(), n, T());
     }
 
 };

@@ -140,5 +140,8 @@ struct __type_traits<T*> {
 
 
 
+
+
+
 __JIANQIAO_END__
 #endif //__JIANQIAO_TYPE_TRAITS_HPP__

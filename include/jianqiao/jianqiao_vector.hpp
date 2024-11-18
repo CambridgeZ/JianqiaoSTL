@@ -122,6 +122,27 @@ public:
     explicit vector(size_type n){
         fill_initialize(n, T());
     }
+    // 采用初值表进行初始化
+    vector(std::initializer_list<T> init, const Alloc& alloc = Alloc()){
+        start = data_allocator::allocate(init.size());
+        finish = uninitialized_copy(init.begin(), init.end(), start);
+        end_of_storage = finish;
+    }
+    // 使用迭代器进行构造
+    template <class InputIterator>
+    vector(InputIterator first, InputIterator last){
+        start = data_allocator::allocate(last - first);
+        finish = uninitialized_copy(first, last, start);
+        end_of_storage = finish;
+    }
+    // 拷贝构造函数
+    vector(const vector<T, Alloc>& x){
+        start = data_allocator::allocate(x.size());
+        finish = uninitialized_copy(x.begin(), x.end(), start);
+        end_of_storage = finish;
+    }
+
+
     ~vector(){
         destroy(start, finish);
         deallocate();

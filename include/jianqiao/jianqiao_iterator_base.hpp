@@ -90,7 +90,7 @@ __distance(InputIterator first, InputIterator last, input_iterator_tag){
 
 //计算 RandomAccessIterator
 template <class RandomAccessIterator>
-inline typename iterator_traits<RandomAccessIterator>:: difference_type 
+inline typename iterator_traits<RandomAccessIterator>:: difference_type
 __distance(RandomAccessIterator first, RandomAccessIterator last, random_access_iterator_tag){
     return last - first;
 }
@@ -117,7 +117,7 @@ inline void __advance(RandomIterator& i,Distance n, random_access_iterator_tag){
 template <class BidirectionalIterator, class Distance>
 inline void __advance(BidirectionalIterator& i, Distance n, bidirectional_iterator_tag){
     if(n > 0){
-        while( n-- ) 
+        while( n-- )
             ++i;
     }
     else {
@@ -130,6 +130,11 @@ template <class InputIterator, class Distance>
 inline void advance(InputIterator& i, Distance n){
     __advance(i, n, iterator_category(i));
 }
+
+
+
+
+
 
 
 

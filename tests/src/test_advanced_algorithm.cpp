@@ -37,7 +37,30 @@ void test_upperbound(){
     cout<<second-vec.begin()<<endl;
 }
 
+void test_next_permutation(){
+    cout << "test3" << endl;
+    vector<int> vec = {1, 2, 3};
+    do{
+        for(auto i : vec){
+            cout << i << " ";
+        }
+        cout << endl;
+    }while(Jianqiao::next_permutation(vec.begin(), vec.end()));
+}
+
+void test_prev_permutation(){
+    cout << "test4" << endl;
+    vector<int> vec = {3, 2, 1};
+    do{
+        for(auto i : vec){
+            cout << i << " ";
+        }
+        cout << endl;
+    }while(Jianqiao::prev_permutation(vec.begin(), vec.end()));
+}
+
 int main(){
-    test_upperbound();
+//    test_next_permutation();
+    test_prev_permutation();
     return 0;
 }

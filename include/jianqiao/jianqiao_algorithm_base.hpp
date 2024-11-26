@@ -62,6 +62,9 @@ OutputIterator fill_n(OutputIterator first, Size n, const T& value){
 }
 
 // iter_swap
+template <class ForwardIterator1, class ForwardIterator2, class T>
+void __iter_swap(ForwardIterator1 a, ForwardIterator2 b, T*);
+
 template <class ForwardIterator1, class ForwardIterator2>
 void iter_swap(ForwardIterator1 a, ForwardIterator2 b){
     __iter_swap(a, b, value_type(a));

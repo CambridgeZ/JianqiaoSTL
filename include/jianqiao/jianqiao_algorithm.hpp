@@ -11,6 +11,9 @@
 #include "heap_base.hpp"
 #include "advanced_algorithm/lower_bound.hpp"
 #include "advanced_algorithm/upper_bound.hpp"
+#include "advanced_algorithm/binary_search.hpp"
+#include "advanced_algorithm/next_permutation.hpp"
+#include "advanced_algorithm/prev_permutation.hpp"
 
 
 #endif //JIANQIAOSTL_JIANQIAO_ALGORITHM_HPP

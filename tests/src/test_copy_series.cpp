@@ -9,7 +9,7 @@
 #include "../../include/jianqiao/jianqiao_list.hpp"
 #include <string>
 #include "../../include/jianqiao/jianqiao_vector.hpp"
-#include "../../include/jianqiao/jianqiao_algorithm.hpp"
+#include "../../include/jianqiao/jianqiao_algorithm_base.hpp"
 
 
 using Jianqiao::copy;

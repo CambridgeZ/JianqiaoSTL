@@ -6,7 +6,7 @@
 #define JIANQIAOSTL_JIANQIAO_RB_TREE_HPP
 
 #include "jianqiao_rb_tree_support.hpp"
-#include "jianqiao_algorithm.hpp"
+#include "jianqiao_algorithm_base.hpp"
 #include <iostream>
 
 using std::cout;

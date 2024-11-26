@@ -7,7 +7,7 @@
 
 #include "config.hpp"
 #include "jianqiao_rb_tree.hpp"
-#include "jianqiao_algorithm.hpp"
+#include "jianqiao_algorithm_base.hpp"
 #include "jianqiao_function.hpp"
 
 __JIANQIAO_BEGIN__

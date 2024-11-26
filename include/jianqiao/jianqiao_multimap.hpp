@@ -9,7 +9,7 @@
 #include "jianqiao_rb_tree.hpp"
 #include "jianqiao_function.hpp"
 #include "jianqiao_pair.hpp"
-#include "jianqiao_algorithm.hpp"
+#include "jianqiao_algorithm_base.hpp"
 
 __JIANQIAO_BEGIN__
 

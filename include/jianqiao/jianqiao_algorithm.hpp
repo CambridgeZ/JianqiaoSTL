@@ -15,6 +15,7 @@
 #include "advanced_algorithm/next_permutation.hpp"
 #include "advanced_algorithm/prev_permutation.hpp"
 #include "advanced_algorithm/random_shuffle.hpp"
-
+#include "advanced_algorithm/partial_sort.hpp"
+#include "advanced_algorithm/sort.hpp"
 
 #endif //JIANQIAOSTL_JIANQIAO_ALGORITHM_HPP

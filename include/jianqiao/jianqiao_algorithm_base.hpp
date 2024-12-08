@@ -1022,9 +1022,14 @@ inline OutputIterator __unique_copy(InputIterator first, InputIterator last, Out
     }
 
 
-
-
-
+    // copy_backward
+    template <class BidirectionalIterator1, class BidirectionalIterator2>
+    BidirectionalIterator2 copy_backward(BidirectionalIterator1 first, BidirectionalIterator1 last, BidirectionalIterator2 result){
+        while(first != last){
+            *--result = *--last;
+        }
+        return result;
+    }
 
 
 

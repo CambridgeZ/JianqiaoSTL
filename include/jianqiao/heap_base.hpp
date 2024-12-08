@@ -67,7 +67,7 @@ void __adjust_heap(RandomAccessIterator first, Distance holeIndex, Distance len,
 template <class RandomAccessIterator>
 void sort_heap(RandomAccessIterator first, RandomAccessIterator last){
     while(last - first > 1){
-        pop_heap(first, last--);
+        Jianqiao::pop_heap(first, last--);
     }
 }
 

@@ -59,6 +59,7 @@ for example in my test file you could find the following lines
 ```cmake
 target_include_directories(test_sort PRIVATE
         ../../../include
+        ../../../include/jianqiao
 )
 ```
 

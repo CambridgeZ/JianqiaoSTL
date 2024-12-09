@@ -8,6 +8,8 @@ This is a simple STL implementation in C++. The main purpose of this project is 
 
 ## 2. Features
 
+This project includes the following containers of STL and implements some classic algorithms.
+
 - [x] Vector
 - [x] List
 - [x] Stack
@@ -39,6 +41,14 @@ This is a simple STL implementation in C++. The main purpose of this project is 
 ```cpp
 #include <jianqiao/jianqiao_vector.hpp>
 ```
+And don't forget to state that the namespace is Jianqiao.
+```cpp
+using namespace Jianqiao;
+```
+You can also use the following line to avoid the namespace.
+```cpp
+using Jianqiao::vector;
+```
 
 3. add the following line in your cmake file.
 ```cmake
@@ -51,3 +61,7 @@ target_include_directories(test_sort PRIVATE
         ../../../include
 )
 ```
+
+## 4. Reference
+
+- [STL源码剖析](https://book.douban.com/subject/1110934/)

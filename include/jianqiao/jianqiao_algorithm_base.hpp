@@ -11,6 +11,7 @@
 #include "type_traits.hpp"
 #include "jianqiao_pair.hpp"
 #include "heap_base.hpp"
+#include "jianqiao_function.hpp"
 
 __JIANQIAO_BEGIN__
 
@@ -127,13 +128,6 @@ template <class T, class Compare>
 inline const T& min(const T& a, const T& b, Compare comp){
     return comp(a, b) ? a : b;
 }
-
-template <typename T>
-struct less{
-    bool operator()(const T& a, const T& b){
-        return a < b;
-    }
-};
 
 // mismatch
 // 比较两个序列，返回第一个不匹配的位置
@@ -1029,6 +1023,21 @@ inline OutputIterator __unique_copy(InputIterator first, InputIterator last, Out
             *--result = *--last;
         }
         return result;
+    }
+
+    // uninitialized_copy
+    template <class InputIterator, class ForwardIterator>
+    ForwardIterator uninitialized_copy(InputIterator first, InputIterator last, ForwardIterator result){
+        ForwardIterator cur = result;
+        try{
+            for(; first != last; ++first, ++cur){
+                construct(&*cur, *first);
+            }
+            return cur;
+        }catch(...){
+            destroy(result, cur);
+            throw;
+        }
     }
 
 
